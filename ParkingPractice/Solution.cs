@@ -52,7 +52,7 @@ public class Solution
             shiftNextDay())
             fees.Add(new SingleDayFee(currentStart, currentEnd, (_, _) => FEE_MAX));
         //最後一日
-        if (currentStart < end)
+        if (currentStart <= end)
         {
             currentEnd = currentEnd.CompareAndTakeSmaller(end);
             fees.Add(new SingleDayFee(currentStart, currentEnd, CalcFee));
