@@ -64,7 +64,7 @@ public class Solution
     #endregion
 
     #region Q3 計算跨日的停車費
-    [Obsolete("使用 CalcParkingFee1 可支援不同停車場的收費原則")]
+    [Obsolete("使用 CalcParkingFee(ParkingRate rate, DateTime start, DateTime end) 可支援不同停車場的收費原則")]
     public ParkingFee CalcParkingFee(DateTime start, DateTime end)
     {
         if (end < start) throw new ArgumentException();
