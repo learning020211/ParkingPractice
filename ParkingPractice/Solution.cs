@@ -1,32 +1,70 @@
-﻿public class ParkingFee
-{
-    public IEnumerable<SingleDayFee> Items { get; private set; }
-    public int TotalFee => Items.Sum(item => item.Fee);
-
-    public ParkingFee(IEnumerable<SingleDayFee> multipleDayFees)
-    {
-        Items = multipleDayFees;
-    }
-}
-
-// 單日停車資訊
-public class SingleDayFee
-{
-    public DateTime StartTime { get; set; } // 精確到分鐘的入場時間
-    public DateTime EndTime { get; set; } // 精確到分鐘的離場時間
-    public int Fee { get; set; } // 本日應收取費用
-
-    public SingleDayFee(DateTime start, DateTime end, Func<DateTime, DateTime, int> getFee)
-    {
-        StartTime = start;
-        EndTime = end;
-        Fee = getFee(start, end);
-    }
-}
+﻿using ParkingPractice.Calculators;
 
 public class Solution
 {
+    #region Q4 支援不同停車場的收費原則
+    public ParkingFee CalcParkingFee(ParkingRate rate, DateTime start, DateTime end)
+    {
+        if (end < start) throw new ArgumentException();
+        //捨去到分
+        start = start.SkipToMinutes();
+        end = end.SkipToMinutes();
+
+        List<SingleDayFee> fees = new List<SingleDayFee>();
+
+        DateTime currentStart = start;
+        DateTime getCurrentEndTime() => currentStart.DateEnd().CompareAndTakeSmaller(end);
+        DateTime currentEnd = getCurrentEndTime();
+
+        void shiftNextDay()
+        {
+            currentStart = currentStart.NextDateStart();
+            currentEnd = getCurrentEndTime();
+        };
+
+
+        while (currentStart <= end)
+        {
+            var dayRate = rate.GetRateByDate(currentStart);
+
+            fees.Add(
+                new SingleDayFee(
+                    currentStart,
+                    currentEnd,
+                    (currentStart, currentEnd) => CalcFee(dayRate, currentStart, currentEnd)
+                ));
+
+            shiftNextDay();
+        }
+
+        return new ParkingFee(fees);
+    }
+
+    private int CalcFee(DayParkingRate rate, DateTime start, DateTime end)
+    {
+        var stay = end - start;
+        //免費時段內不收費
+        if (stay <= rate.FreeTime) return 0;
+
+        int timeRange_index = 0; //當日第幾個費率時段
+        int total = 0;
+
+        for (var currentTime = start;
+            currentTime < end;
+            currentTime += rate.UnitTime, //每次向後移動單位時間
+            timeRange_index ++
+            )
+        {
+            total += rate.GetCurrentFee(timeRange_index); //累計單位時間費用
+            //到達最高收費, 不再計算
+            if (total >= rate.FeeMax) return rate.FeeMax;
+        }
+        return total;
+    }
+    #endregion
+
     #region Q3 計算跨日的停車費
+    [Obsolete("使用 CalcParkingFee1 可支援不同停車場的收費原則")]
     public ParkingFee CalcParkingFee(DateTime start, DateTime end)
     {
         if (end < start) throw new ArgumentException();
@@ -107,4 +145,11 @@ public static class Extensions
         dateTime.NextDateStart().AddMinutes(-1);
     public static DateTime CompareAndTakeSmaller(this DateTime dateTime, DateTime dateTimeToCompare) =>
         dateTime < dateTimeToCompare ? dateTime : dateTimeToCompare;
+    public static DayParkingRate GetRateByDate(this ParkingRate rate, DateTime dateTime) =>
+        dateTime.DayOfWeek switch
+        {
+            DayOfWeek.Saturday => rate.Holiday,
+            DayOfWeek.Sunday => rate.Holiday,
+            _ => rate.Weekday
+        };
 }

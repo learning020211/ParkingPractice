@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ParkingPractice.Calculators;
 using System;
 using System.Linq;
 
@@ -76,5 +77,80 @@ namespace Tests
 
             Assert.ThrowsException<ArgumentException>(() => new Solution().CalcParkingFee(start, end));
         }
+
+        [TestMethod()]
+        [DataRow("2022/5/1 09:00:00", "2022/5/1 09:10:59", 0, 1, DisplayName = "同一天")]
+        [DataRow("2022/5/1 09:00:00", "2022/5/1 09:11:59", 7, 1, DisplayName = "同一天")]
+        [DataRow("2022/5/1 09:00:00", "2022/5/1 10:00:59", 10, 1, DisplayName = "同一天")]
+
+        [DataRow("2022/5/1 23:49:00", "2022/5/2 00:10:59", 0, 2, DisplayName = "跨一天,免費")]
+
+        [DataRow("2022/5/1 23:48:00", "2022/5/2 00:00:00", 7, 2, DisplayName = "跨一天,收費")]
+        [DataRow("2022/5/1 23:48:00", "2022/5/2 00:11:59", 14, 2, DisplayName = "跨一天,收費")]
+        [DataRow("2022/5/1 00:00:00", "2022/5/2 00:11:59", 57, 2, DisplayName = "跨一天,收費")]
+
+        [DataRow("2022/5/1 23:49:00", "2022/5/3 00:11:59", 57, 3, DisplayName = "跨2天,收費")]
+        [DataRow("2022/5/1 22:59:00", "2022/5/3 00:11:59", 67, 3, DisplayName = "跨2天,收費")]
+        [DataRow("2022/5/1 00:00:00", "2022/5/3 00:11:59", 107, 3, DisplayName = "跨2天,收費")]
+        public void CalcParkingFeeTestA(string start, string end, int fee, int days)
+        {
+            var rate = new ParkingRateA();
+            var parkingFee = new Solution().CalcParkingFee(rate, DateTime.Parse(start), DateTime.Parse(end));
+            Assert.IsTrue(fee == parkingFee.TotalFee && days == parkingFee.Items.Count());
+        }
+
+        [TestMethod]
+        //平日
+        [DataRow("2022/5/2 09:00:00", "2022/5/2 09:10:59", 0, 1, DisplayName = "同一天")]
+        [DataRow("2022/5/2 09:00:00", "2022/5/2 09:11:59", 7, 1, DisplayName = "同一天")]
+        [DataRow("2022/5/2 09:00:00", "2022/5/2 10:00:59", 10, 1, DisplayName = "同一天")]
+        [DataRow("2022/5/2 23:49:00", "2022/5/3 00:10:59", 0, 2, DisplayName = "跨一天,免費")]
+        [DataRow("2022/5/2 23:48:00", "2022/5/3 00:00:00", 7, 2, DisplayName = "跨一天,收費")]
+        [DataRow("2022/5/2 23:48:00", "2022/5/3 00:11:59", 14, 2, DisplayName = "跨一天,收費")]
+        [DataRow("2022/5/2 00:00:00", "2022/5/3 00:11:59", 57, 2, DisplayName = "跨一天,收費")]
+        [DataRow("2022/5/2 23:49:00", "2022/5/4 00:11:59", 57, 3, DisplayName = "跨2天,收費")]
+        [DataRow("2022/5/2 22:59:00", "2022/5/4 00:11:59", 67, 3, DisplayName = "跨2天,收費")]
+        [DataRow("2022/5/2 00:00:00", "2022/5/4 00:11:59", 107, 3, DisplayName = "跨2天,收費")]
+
+        //假日
+        [DataRow("2022/5/7 09:00:00", "2022/5/7 09:01:59", 15, 1, DisplayName = "1分鐘,15元")]
+        [DataRow("2022/5/7 09:00:00", "2022/5/7 10:00:59", 15, 1, DisplayName = "60分鐘,15元")]
+        [DataRow("2022/5/7 09:00:00", "2022/5/7 09:00:59", 0, 1, DisplayName = "0分, 0元")]
+        [DataRow("2022/5/7 09:00:00", "2022/5/7 10:01:59", 30, 1, DisplayName = "61分, 30元")]
+
+        [DataRow("2022/5/7 23:58:00", "2022/5/8 00:01:00", 30, 2, DisplayName = "跨一天,收費")]
+        [DataRow("2022/5/7 00:00:00", "2022/5/8 00:11:59", 265, 2, DisplayName = "250 + 15")]
+        public void CalcParkingFeeTestB(string start, string end, int fee, int days)
+        {
+            var rate = new ParkingRateB();
+            var parkingFee = new Solution().CalcParkingFee(rate, DateTime.Parse(start), DateTime.Parse(end));
+            Assert.IsTrue(fee == parkingFee.TotalFee && days == parkingFee.Items.Count());
+
+        }
+
+        [TestMethod]
+        //平日
+        [DataRow("2022/5/2 09:00:00", "2022/5/2 10:00:59", 20, 1, DisplayName = "同一天, 第一小時為20元")]
+        [DataRow("2022/5/2 09:00:00", "2022/5/2 10:01:00", 50, 1, DisplayName = "同一天, 61分,第一小時20,第二小時起,每小時30")]
+        [DataRow("2022/5/2 09:00:00", "2022/5/2 11:01:00", 80, 1, DisplayName = "2小又1分,第一小時20,第二小時起,每小時30")]
+        [DataRow("2022/5/2 09:00:00", "2022/5/2 12:01:00", 110, 1, DisplayName = "3小又1分,第一小時20,第二小時起,每小時30")]
+
+        [DataRow("2022/5/2 23:48:00", "2022/5/3 00:00:00", 20, 2, DisplayName = "跨一天,20 + 0")]
+        [DataRow("2022/5/2 23:48:00", "2022/5/3 00:11:59", 40, 2, DisplayName = "跨一天,20 + 20")]
+        [DataRow("2022/5/2 00:00:00", "2022/5/3 01:01:00", 350, 2, DisplayName = "跨一天,第二天1小時又1分, 300 + 50")]
+
+        [DataRow("2022/5/2 23:49:00", "2022/5/4 00:11:59", 340, 3, DisplayName = "跨2天,20 + 300 + 20")]
+
+        //假日
+        [DataRow("2022/5/7 00:00:00", "2022/5/7 23:59:59", 0, 1, DisplayName = "1分鐘,假日免費")]
+        [DataRow("2022/5/7 00:00:00", "2022/5/8 23:59:59", 0, 2, DisplayName = "跨一天,假日免費")]
+        public void CalcParkingFeeTestC(string start, string end, int fee, int days)
+        {
+            var rate = new ParkingRateC();
+            var parkingFee = new Solution().CalcParkingFee(rate, DateTime.Parse(start), DateTime.Parse(end));
+            Assert.IsTrue(fee == parkingFee.TotalFee && days == parkingFee.Items.Count());
+
+        }
+
     }
 }
