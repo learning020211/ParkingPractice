@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ParkingPractice.Calculators
 {
     //每一天都採用目前的收費費率
-    public class DayParkingRateA : DayParkingRate
+    public class DayParkingRateA : IDayParkingRate
     {
         public TimeSpan FreeTime => TimeSpan.FromMinutes(10);
         public int FeeMax => 50;

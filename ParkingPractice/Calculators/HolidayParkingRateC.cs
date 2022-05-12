@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ParkingPractice.Calculators
 {
-    public class HolidayParkingRateC : DayParkingRate
+    public class HolidayParkingRateC : IDayParkingRate
     {
         //全日免費
         public TimeSpan FreeTime => TimeSpan.FromDays(1);

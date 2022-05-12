@@ -152,5 +152,23 @@ namespace Tests
 
         }
 
+        [TestMethod()]
+        [DataRow("2022/5/7 00:00:00", "2022/5/7 23:59:59", 240, DisplayName = "停一天")]
+        [DataRow("2022/5/7 00:00:00", "2022/5/7 00:01:00", 5, DisplayName = "停一分鐘")]
+        public void CalcPeriodFeeTestA(string start, string end, int fee)
+        {
+            //費率A : 00:00 ~ 24:00 , 每 30 分鐘 5 元, 無上限
+            var rate = new PeriodRate()
+            {
+                StartTime = TimeSpan.Zero,
+                EndTime = TimeSpan.FromDays(1),
+                UnitTime = TimeSpan.FromMinutes(30),
+                Fee = 5,
+            };
+
+            var parkingFee = new Solution().CalcPeriodFee(rate, DateTime.Parse(start), DateTime.Parse(end));
+
+            Assert.AreEqual(parkingFee.Sum(f => f.Fee) , fee);
+        }
     }
 }

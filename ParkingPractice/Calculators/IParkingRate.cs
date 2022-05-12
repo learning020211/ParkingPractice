@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ParkingPractice.Calculators
 {
-    public interface ParkingRate
+    public interface IParkingRate
     {
-        DayParkingRate Weekday { get; }
-        DayParkingRate Holiday { get; }
+        IDayParkingRate Weekday { get; }
+        IDayParkingRate Holiday { get; }
     }
 }

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace ParkingPractice.Calculators
 {
-    public class ParkingRateA : ParkingRate
+    public class ParkingRateA : IParkingRate
     {
-        public DayParkingRate Weekday { get; } = new DayParkingRateA();
+        public IDayParkingRate Weekday { get; } = new DayParkingRateA();
 
-        public DayParkingRate Holiday => Weekday;
+        public IDayParkingRate Holiday => Weekday;
     }
 }

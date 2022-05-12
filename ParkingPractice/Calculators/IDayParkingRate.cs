@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ParkingPractice.Calculators
 {
-    public interface DayParkingRate
+    public interface IDayParkingRate
     {
         /// <summary>
         /// 免費時間
@@ -20,5 +20,6 @@ namespace ParkingPractice.Calculators
         /// <param name="timeRange_index">本日第幾個時段</param>
         /// <returns>當前時段費用</returns>
         int GetCurrentFee(int timeRange_index);
+
     }
 }
