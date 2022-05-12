@@ -2,7 +2,7 @@
 
 public static class Extensions
 {
-    public static DateTime SkipToMinutes(this DateTime dateTime) =>
+    public static DateTime SkipToMinute(this DateTime dateTime) =>
         dateTime.Date.AddMinutes((int)dateTime.TimeOfDay.TotalMinutes);
     public static DateTime NextDateStart(this DateTime dateTime) =>
         dateTime.Date.AddDays(1);

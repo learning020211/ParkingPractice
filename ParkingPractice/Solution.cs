@@ -7,8 +7,8 @@ public class Solution
     {
         if (end < start) throw new ArgumentException();
         //捨去到分
-        start = start.SkipToMinutes();
-        end = end.SkipToMinutes();
+        start = start.SkipToMinute();
+        end = end.SkipToMinute();
 
         List<SingleDayFee> fees = new List<SingleDayFee>();
 
@@ -69,8 +69,8 @@ public class Solution
     {
         if (end < start) throw new ArgumentException();
 
-        start = start.SkipToMinutes();
-        end = end.SkipToMinutes();
+        start = start.SkipToMinute();
+        end = end.SkipToMinute();
 
         List<SingleDayFee> fees = new List<SingleDayFee>();
 
@@ -113,8 +113,8 @@ public class Solution
     public int CalcFee(DateTime start, DateTime end)
     {
         //捨去到分
-        start = start.SkipToMinutes();
-        end = end.SkipToMinutes();
+        start = start.SkipToMinute();
+        end = end.SkipToMinute();
 
         var stay = end - start;
         //免費時段內不收費
@@ -131,6 +131,6 @@ public class Solution
 
     #region Q1 計算停車分鐘數
     public int GetStayMinutes(DateTime start, DateTime end) =>
-        (int)(end.SkipToMinutes() - start.SkipToMinutes()).TotalMinutes;
+        (int)(end.SkipToMinute() - start.SkipToMinute()).TotalMinutes;
     #endregion
 }

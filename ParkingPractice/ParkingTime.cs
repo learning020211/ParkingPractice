@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace ParkingPractice
 {
-    public class ParkingTime : IComparable<DateTime>
+    public struct ParkingTime : IComparable<DateTime>
     {
         public DateTime Value { get; private set; }
         public ParkingTime(DateTime parkingTime)
         {
-            Value = parkingTime.SkipToMinutes();
+            Value = parkingTime.SkipToMinute();
         }
 
         public int CompareTo(DateTime other) => Value.CompareTo(other);
