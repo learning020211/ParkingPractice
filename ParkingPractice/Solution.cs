@@ -13,8 +13,8 @@ public class Solution
     public IEnumerable<UnitFee> CalcPeriodFee(PeriodRate rate, DateTime startTime, DateTime endTime)
     {
         //捨去到分
-        startTime = startTime.SkipToMinutes();
-        endTime = endTime.SkipToMinutes();
+        startTime = startTime.SkipToMinute();
+        endTime = endTime.SkipToMinute();
 
         //計算的相對時間範圍
         var start = startTime.TimeOfDay;
@@ -65,8 +65,8 @@ public class Solution
     {
         if (end < start) throw new ArgumentException();
         //捨去到分
-        start = start.SkipToMinutes();
-        end = end.SkipToMinutes();
+        start = start.SkipToMinute();
+        end = end.SkipToMinute();
 
         List<SingleDayFee> fees = new List<SingleDayFee>();
 
@@ -127,8 +127,8 @@ public class Solution
     {
         if (end < start) throw new ArgumentException();
 
-        start = start.SkipToMinutes();
-        end = end.SkipToMinutes();
+        start = start.SkipToMinute();
+        end = end.SkipToMinute();
 
         List<SingleDayFee> fees = new List<SingleDayFee>();
 
@@ -171,8 +171,8 @@ public class Solution
     public int CalcFee(DateTime start, DateTime end)
     {
         //捨去到分
-        start = start.SkipToMinutes();
-        end = end.SkipToMinutes();
+        start = start.SkipToMinute();
+        end = end.SkipToMinute();
 
         var stay = end - start;
         //免費時段內不收費
@@ -189,26 +189,6 @@ public class Solution
 
     #region Q1 計算停車分鐘數
     public int GetStayMinutes(DateTime start, DateTime end) =>
-        (int)(end.SkipToMinutes() - start.SkipToMinutes()).TotalMinutes;
+        (int)(end.SkipToMinute() - start.SkipToMinute()).TotalMinutes;
     #endregion
-}
-
-public static class Extensions
-{
-    public static DateTime SkipToMinutes(this DateTime dateTime) =>
-        dateTime.Date.AddMinutes((int)dateTime.TimeOfDay.TotalMinutes);
-    public static DateTime NextDateStart(this DateTime dateTime) =>
-        dateTime.Date.AddDays(1);
-    public static DateTime DateEnd(this DateTime dateTime) =>
-        dateTime.NextDateStart().AddMinutes(-1);
-    public static DateTime CompareAndTakeSmaller(this DateTime dateTime, DateTime dateTimeToCompare) =>
-        dateTime < dateTimeToCompare ? dateTime : dateTimeToCompare;
-
-    public static IDayParkingRate GetRateByDate(this IParkingRate rate, DateTime dateTime) =>
-        dateTime.DayOfWeek switch
-        {
-            DayOfWeek.Saturday => rate.Holiday,
-            DayOfWeek.Sunday => rate.Holiday,
-            _ => rate.Weekday
-        };
 }
